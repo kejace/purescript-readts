@@ -10,14 +10,14 @@ function readTypes(configFilename, include) {
     var output = [];
     for (var _i = 0, _a = program.getSourceFiles(); _i < _a.length; _i++) {
         var sourceFile = _a[_i];
-        ts.forEachChild(sourceFile, visit);
+        ts.forEachChild(sourceFile, visit(sourceFile.fileName));
     }
     return output;
-    function visit(node) {
+    var visit = function (fileName) { return function (node) {
         if (!isNodeExported(node)) {
             return;
         }
-        if (ts.isInterfaceDeclaration(node) && include(node.name.text)) {
+        if (ts.isInterfaceDeclaration(node) && include(fileName, node.name.text)) {
             var symbol = checker.getSymbolAtLocation(node.name);
             if (symbol) {
                 var nodeType = checker.getTypeAtLocation(node);
@@ -28,9 +28,9 @@ function readTypes(configFilename, include) {
             }
         }
         else if (ts.isModuleDeclaration(node)) {
-            ts.forEachChild(node, visit);
+            ts.forEachChild(node, visit(fileName));
         }
-    }
+    }; };
     function optionalMember(s, n) {
         var optional = ((s.flags & ts.SymbolFlags.Optional) == ts.SymbolFlags.Optional);
         var memType = checker.getTypeOfSymbolAtLocation(s, n ? n : s.valueDeclaration);
