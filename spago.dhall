@@ -1,4 +1,6 @@
-{ name =
+{ sources =
+    [ "src/**/*.purs", "test/**/*.purs" ]
+, name =
     "purescript-readts"
 , dependencies =
     [ "argonaut-codecs"
