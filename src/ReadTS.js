@@ -13,24 +13,26 @@ function readTypes(configFilename, include) {
         ts.forEachChild(sourceFile, visit(sourceFile.fileName));
     }
     return output;
-    var visit = function (fileName) { return function (node) {
-        if (!isNodeExported(node)) {
-            return;
-        }
-        if (ts.isInterfaceDeclaration(node) && include(fileName, node.name.text)) {
-            var symbol = checker.getSymbolAtLocation(node.name);
-            if (symbol) {
-                var nodeType = checker.getTypeAtLocation(node);
-                if (nodeType.isClassOrInterface()) {
-                    var members = convertProperties(nodeType, node);
-                    output.push({ type: "interface", name: node.name.text, members: members });
+    function visit(fileName) {
+        return function (node) {
+            if (!isNodeExported(node)) {
+                return;
+            }
+            if (ts.isInterfaceDeclaration(node) && include(fileName, node.name.text)) {
+                var symbol = checker.getSymbolAtLocation(node.name);
+                if (symbol) {
+                    var nodeType = checker.getTypeAtLocation(node);
+                    if (nodeType.isClassOrInterface()) {
+                        var members = convertProperties(nodeType, node);
+                        output.push({ type: "interface", name: node.name.text, members: members });
+                    }
                 }
             }
-        }
-        else if (ts.isModuleDeclaration(node)) {
-            ts.forEachChild(node, visit(fileName));
-        }
-    }; };
+            else if (ts.isModuleDeclaration(node)) {
+                ts.forEachChild(node, visit(fileName));
+            }
+        };
+    }
     function optionalMember(s, n) {
         var optional = ((s.flags & ts.SymbolFlags.Optional) == ts.SymbolFlags.Optional);
         var memType = checker.getTypeOfSymbolAtLocation(s, n ? n : s.valueDeclaration);
@@ -51,7 +53,7 @@ function readTypes(configFilename, include) {
         }
         else
             alias = {};
-        return tslib_1.__assign({}, alias, getTSType(t));
+        return tslib_1.__assign(tslib_1.__assign({}, alias), getTSType(t));
     }
     function getFullyQualifiedName(s) {
         return checker.getFullyQualifiedName(s);

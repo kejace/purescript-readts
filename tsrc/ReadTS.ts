@@ -26,29 +26,31 @@ export function readTypes(
   return output;
 
   /** visit nodes finding exported classes */
-  var visit = (fileName: string) => (node: ts.Node) => {
-    // Only consider exported nodes
-    if (!isNodeExported(node)) {
-      return;
-    }
-
-    if (ts.isInterfaceDeclaration(node) && include(fileName, node.name.text)) {
-      // This is a top level class, get its symbol
-      let symbol = checker.getSymbolAtLocation(node.name);
-      if (symbol) {
-        let nodeType = checker.getTypeAtLocation(node);
-        if (nodeType.isClassOrInterface())
-        {
-          let members = convertProperties(nodeType, node);
-          output.push({type: "interface", name: node.name.text, members});
-        }
+  function visit(fileName: string) {
+    return (node: ts.Node) => {
+      // Only consider exported nodes
+      if (!isNodeExported(node)) {
+        return;
       }
-      // No need to walk any further, class expressions/inner declarations
-      // cannot be exported
-    } else if (ts.isModuleDeclaration(node)) {
-      // This is a namespace, visit its children
-      ts.forEachChild(node, visit(fileName));
-    }
+
+      if (ts.isInterfaceDeclaration(node) && include(fileName, node.name.text)) {
+        // This is a top level class, get its symbol
+        let symbol = checker.getSymbolAtLocation(node.name);
+        if (symbol) {
+          let nodeType = checker.getTypeAtLocation(node);
+          if (nodeType.isClassOrInterface())
+          {
+            let members = convertProperties(nodeType, node);
+            output.push({type: "interface", name: node.name.text, members});
+          }
+        }
+        // No need to walk any further, class expressions/inner declarations
+        // cannot be exported
+      } else if (ts.isModuleDeclaration(node)) {
+        // This is a namespace, visit its children
+        ts.forEachChild(node, visit(fileName));
+      }
+    };
   }
 
   function optionalMember(s: ts.Symbol, n?: ts.Node) {
