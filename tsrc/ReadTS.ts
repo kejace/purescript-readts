@@ -8,7 +8,7 @@ export function readTypes(
   // Build a program using the set of root file names in fileNames
   var configJson = ts.parseConfigFileTextToJson(configFilename, ts.sys.readFile(configFilename)).config;
   var config = ts.parseJsonConfigFileContent(configJson, ts.sys, configFilename.replace(/[^/]+$/, ''), {}, configFilename);
-    
+
   let program = ts.createProgram(config.fileNames, config.options);
 
   // Get the checker, we will use it to find more about classes
@@ -16,7 +16,7 @@ export function readTypes(
 
   let output: any[] = [];
 
-  
+
   // Visit every sourceFile in the program
   for (const sourceFile of program.getSourceFiles()) {
       // Walk the tree to search for classes
@@ -38,7 +38,7 @@ export function readTypes(
       if (symbol) {
         let nodeType = checker.getTypeAtLocation(node);
         if (nodeType.isClassOrInterface())
-        {          
+        {
           let members = convertProperties(nodeType, node);
           output.push({type: "interface", name: node.name.text, members});
         }
@@ -56,7 +56,7 @@ export function readTypes(
     let memType = checker.getTypeOfSymbolAtLocation(s, n ? n : s.valueDeclaration);
     return {name:s.name, type: getWithAliasProps(memType), optional};
   }
-  
+
 
   function convertProperties(t: ts.Type, n?: ts.Node): any {
     return t.getProperties().map( (s: ts.Symbol) => optionalMember(s, n) );
@@ -69,7 +69,7 @@ export function readTypes(
       alias = {
         "alias": {
           "typeReference": getFullyQualifiedName(t.aliasSymbol),
-          "typeParams": t.aliasTypeArguments ? t.aliasTypeArguments.map(getTSType):[] 
+          "typeParams": t.aliasTypeArguments ? t.aliasTypeArguments.map(getTSType):[]
         }
       }
     } else alias = {}
@@ -104,7 +104,7 @@ export function readTypes(
       let sig =callSigs[0];
       let params = sig.getParameters().map((p: ts.Symbol) => optionalMember(p));
       return {type:"function", params, return: getWithAliasProps(sig.getReturnType()) };
-    } 
+    }
     if (memType.flags & (ts.TypeFlags.Object | ts.TypeFlags.NonPrimitive))
     {
       let objFlags = (<ts.ObjectType> memType).objectFlags;
@@ -112,9 +112,9 @@ export function readTypes(
       {
         let tr = (<ts.TypeReference> memType);
         return {
-          type: "typeReference", name: getFullyQualifiedName(memType.symbol), 
-          typeParams: tr.typeArguments ? tr.typeArguments.map(getWithAliasProps):[], 
-          flags: memType.flags, 
+          type: "typeReference", name: getFullyQualifiedName(memType.symbol),
+          typeParams: tr.typeArguments ? tr.typeArguments.map(getWithAliasProps):[],
+          flags: memType.flags,
           objFlags
         }
       }
@@ -122,7 +122,7 @@ export function readTypes(
         if (objFlags & ts.ObjectFlags.Anonymous)
         {
           return {
-            type: "object", 
+            type: "object",
             members: convertProperties( memType)
           }
         }
