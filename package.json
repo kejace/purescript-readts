@@ -12,5 +12,9 @@
     "@types/node": "^10.9.4",
     "tslib": "^1.9.3",
     "typescript": "^3.0.3"
+  },
+  "devDependencies": {
+    "purescript": "~0.13.6",
+    "spago": "~0.14.0"
   }
 }
