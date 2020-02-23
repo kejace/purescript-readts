@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "tsc && psc-package build",
+    "build": "tsc && spago build",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Jolse Maginnis",
