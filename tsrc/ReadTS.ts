@@ -3,7 +3,7 @@ import * as ts from "typescript";
 /** Generate documentation for all classes in a set of .ts files */
 export function readTypes(
   configFilename: string,
-  include: (name:string) => boolean,
+  include: (fileName: string, name:string) => boolean,
 ): any[] {
   // Build a program using the set of root file names in fileNames
   var configJson = ts.parseConfigFileTextToJson(configFilename, ts.sys.readFile(configFilename)).config;
@@ -20,19 +20,19 @@ export function readTypes(
   // Visit every sourceFile in the program
   for (const sourceFile of program.getSourceFiles()) {
       // Walk the tree to search for classes
-      ts.forEachChild(sourceFile, visit);
+      ts.forEachChild(sourceFile, visit(sourceFile.fileName));
   }
 
   return output;
 
   /** visit nodes finding exported classes */
-  function visit(node: ts.Node) {
+  var visit = (fileName: string) => (node: ts.Node) => {
     // Only consider exported nodes
     if (!isNodeExported(node)) {
       return;
     }
 
-    if (ts.isInterfaceDeclaration(node) && include(node.name.text)) {
+    if (ts.isInterfaceDeclaration(node) && include(fileName, node.name.text)) {
       // This is a top level class, get its symbol
       let symbol = checker.getSymbolAtLocation(node.name);
       if (symbol) {
@@ -47,7 +47,7 @@ export function readTypes(
       // cannot be exported
     } else if (ts.isModuleDeclaration(node)) {
       // This is a namespace, visit its children
-      ts.forEachChild(node, visit);
+      ts.forEachChild(node, visit(fileName));
     }
   }
 

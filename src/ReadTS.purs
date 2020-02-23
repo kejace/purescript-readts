@@ -18,7 +18,7 @@ type NamedTSType = {name:: String, optional::Boolean, t:: TSType }
 
 type TypeRefParams = {name::String, typeArgs:: Array TSType}
 
-foreign import readTypes :: EffectFn2 String (String -> Boolean) Json
+foreign import readTypes :: EffectFn2 String (String -> String -> Boolean) Json
 
 data TSType = Interface {name :: String, members::Array NamedTSType}
   | StringLiteral String
@@ -188,7 +188,7 @@ visitTypes f =
   in rec
 
 
-readInterfaceTypes :: String -> (String -> Boolean) -> Effect (Array TSType)
+readInterfaceTypes :: String -> (String -> String -> Boolean) -> Effect (Array TSType)
 readInterfaceTypes tsconfig include = do
   result <- (decodeJson >=> traverse decodeTSType) <$> runEffectFn2 readTypes tsconfig include
   either (throwException <<< error) pure result
