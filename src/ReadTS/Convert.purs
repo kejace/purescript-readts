@@ -102,8 +102,8 @@ unionMapping f = case _  of
 standardMappings :: (TSType -> PSTypeDecl) -> TSType -> PSTypeDecl
 standardMappings f t =
   let m = unionMapping f t <|>
-  simpleMapping t <|> arrayMapping f t <|>
-  functionMapping f t <|> objectMapping f t
+          simpleMapping t <|> arrayMapping f t <|>
+          functionMapping f t <|> objectMapping f t
   in fromMaybe' (\_ -> TCommented (show t) anyType) m
 
 referenceMapping :: (String -> Array TSType -> Maybe PSTypeDecl) -> TSType -> Maybe PSTypeDecl

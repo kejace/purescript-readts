@@ -195,7 +195,7 @@ createDirsForModule _basepath moduleName = do
   mkdirs basepath $ List.fromFoldable paths
 
 writeComponent :: FilePath -> ComponentModule -> Effect Unit
-writeComponent basepath cm@{name ,"module": mod@PSModule {name:moduleName}} = do
+writeComponent basepath cm@{name ,"module": mod@(PSModule {name:moduleName})} = do
   let
     componentFFI = "exports." <> cm.classFuncName <> " = " <> " require('" <> cm.classRequire  <> "')." <> cm.classProperty <> "\n"
 
