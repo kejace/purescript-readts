@@ -10,9 +10,9 @@
   "author": "Jolse Maginnis",
   "license": "MIT",
   "dependencies": {
-    "@types/node": "^10.9.4",
-    "tslib": "^1.9.3",
-    "typescript": "^3.0.3"
+    "@types/node": "~12.12.28",
+    "tslib": "~1.11.0",
+    "typescript": "~3.8.2"
   },
   "devDependencies": {
     "purescript": "~0.13.6",
