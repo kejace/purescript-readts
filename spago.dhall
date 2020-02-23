@@ -1,16 +1,8 @@
-{ name = "purescript-readts"
-, dependencies =
-  [ "prelude"
-  , "argonaut-codecs"
-  , "argonaut-core"
-  , "console"
-  , "debug"
-  , "effect"
-  , "exceptions"
-  , "node-fs"
-  , "psci-support"
-  , "strings"
+let conf = ./dist.dhall
+
+in conf // {
+  dependencies = conf.dependencies #
+  [ "spec"
   ]
-, packages = ./packages.dhall
-, sources = [ "src/**/*.purs" ]
+, sources = conf.sources # [ "test/**/*.purs" ]
 }

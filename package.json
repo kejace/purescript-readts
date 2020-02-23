@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "tsc && spago build",
+    "build": "tsc && spago -x dist.dhall build",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Jolse Maginnis",
