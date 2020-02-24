@@ -85,7 +85,8 @@ function readTypes(configFilename, include) {
             if (objFlags & ts.ObjectFlags.Reference) {
                 var tr = memType;
                 return {
-                    type: "typeReference", name: getFullyQualifiedName(memType.symbol),
+                    type: "typeReference",
+                    name: memType.symbol ? getFullyQualifiedName(memType.symbol) : '!!!unknown!!!',
                     typeParams: tr.typeArguments ? tr.typeArguments.map(getWithAliasProps) : [],
                     flags: memType.flags,
                     objFlags: objFlags
