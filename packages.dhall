@@ -3,6 +3,12 @@ let upstream =
 
 let overrides = {=}
 
-let additions = {=}
+let additions =
+      { tscompat =
+          { dependencies = [ "prelude", "react", "typelevel-prelude" ]
+          , repo = "https://github.com/doolse/purescript-tscompat"
+          , version = "v1.0.1"
+          }
+      }
 
 in  upstream // overrides // additions
