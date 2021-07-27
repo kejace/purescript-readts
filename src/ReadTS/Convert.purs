@@ -4,9 +4,9 @@ import Prelude
 
 import Control.Alt ((<|>))
 import Data.Array (filter, mapMaybe, null)
-import Data.Either (fromRight)
+import Data.Either (hush)
 import Data.Foldable (any)
-import Data.Maybe (Maybe(..), fromMaybe')
+import Data.Maybe (Maybe(..), fromMaybe', fromJust)
 import Data.Set as Set
 import Data.String (Pattern(..), Replacement(..), indexOf, replaceAll, toLower, toUpper)
 import Data.String as String
@@ -129,7 +129,7 @@ collectStrings = visitTypes $ case _ of
   _ -> []
 
 camelHyphen :: Regex
-camelHyphen = unsafePartial fromRight $ regex "-([a-z])" $ parseFlags "ig"
+camelHyphen = unsafePartial $ fromJust $ hush $ regex "-([a-z])" $ parseFlags "ig"
 
 reservedIdentifiers :: Set.Set String
 reservedIdentifiers = Set.fromFoldable [
@@ -141,7 +141,7 @@ reservedIdentifiers = Set.fromFoldable [
 ]
 
 escapeFunc :: String -> String
-escapeFunc l = let cameled = unsafePartial $ replace' camelHyphen (\_ [a] -> toUpper a) l
+escapeFunc l = let cameled = unsafePartial $ replace' camelHyphen (\_ [a] -> toUpper (unsafePartial $ fromJust a)) l
   in case lowerFirst $ replaceAll (Pattern " ") (Replacement "_") $ cameled of
     funcName | Set.member funcName reservedIdentifiers -> funcName <> "_"
     fn -> fn

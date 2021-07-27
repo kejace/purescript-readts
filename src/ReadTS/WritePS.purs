@@ -3,12 +3,12 @@ module ReadTS.WritePS where
 import Prelude
 
 import Data.Array (foldMap, mapMaybe)
-import Data.Either (fromRight)
+import Data.Either (hush)
 import Data.Foldable (maximum)
 import Data.List (List(..))
 import Data.List as List
 import Data.Map as Map
-import Data.Maybe (Maybe(..), fromMaybe, maybe)
+import Data.Maybe (Maybe(..), fromMaybe, maybe, fromJust)
 import Data.Set as Set
 import Data.String (joinWith)
 import Data.String.Regex (Regex, regex, test)
@@ -58,7 +58,7 @@ needImport "" = false
 needImport _ = true
 
 legalMemberCharRegex :: Regex
-legalMemberCharRegex = unsafePartial $ fromRight $ regex "^[a-z]\\w*$" Flags.noFlags
+legalMemberCharRegex = unsafePartial $ fromJust $ hush $ regex "^[a-z]\\w*$" Flags.noFlags
 
 memberNeedsEscaping :: String -> Boolean
 memberNeedsEscaping = not <<< test legalMemberCharRegex

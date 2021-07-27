@@ -1,8 +1,9 @@
 module ReadTS where
+
 import Prelude
 
 import Data.Argonaut.Core (Json)
-import Data.Argonaut.Decode (decodeJson, (.:), (.:?))
+import Data.Argonaut.Decode (JsonDecodeError, decodeJson, (.:), (.:?))
 import Data.Array (foldMap)
 import Data.Either (Either(..), either)
 import Data.Maybe (Maybe, maybe)
@@ -13,6 +14,7 @@ import Effect (Effect)
 import Effect.Exception (error, throwException)
 import Effect.Uncurried (EffectFn2, runEffectFn2)
 import Foreign.Object (Object)
+import Data.Argonaut.Decode.Error
 
 type NamedTSType = {name:: String, optional::Boolean, t:: TSType }
 
@@ -104,13 +106,13 @@ symbolsForDeclaration = case _ of
   DTypeAlias _ _ t -> symbolsForType t
   DFunction {ftype, bodySyms} -> symbolsForType ftype <> bodySyms
 
-decodeAlias :: Object Json -> Either String TypeRefParams
+decodeAlias :: Object Json -> Either JsonDecodeError TypeRefParams
 decodeAlias o = do
    name <- o .: "typeReference"
    typeArgs <- o .: "typeParams" >>= traverse decodeTSType
    pure {name, typeArgs}
 
-decodeTSType :: Json -> Either String TSType
+decodeTSType :: Json -> Either JsonDecodeError TSType
 decodeTSType v = do
   o <- decodeJson v
   let decodeMembers = o .: "members" >>= traverse decodeMember
@@ -145,7 +147,7 @@ decodeTSType v = do
       name <- o .: "name"
       typeArgs <- o .: "typeParams" >>= traverse decodeTSType
       pure $ TypeReference {name,typeArgs}
-    t -> Left $ "Unknown type" <> show t
+    t -> Left $ TypeMismatch $ "Unknown type" <> show t
   where
   decodeMember o = do
     name <- o .: "name"
@@ -191,4 +193,4 @@ visitTypes f =
 readInterfaceTypes :: String -> (String -> String -> Boolean) -> Effect (Array TSType)
 readInterfaceTypes tsconfig include = do
   result <- (decodeJson >=> traverse decodeTSType) <$> runEffectFn2 readTypes tsconfig include
-  either (throwException <<< error) pure result
+  either (throwException <<< error <<< show) pure result
