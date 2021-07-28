@@ -189,7 +189,6 @@ visitTypes f =
         _ -> mempty
   in rec
 
-
 readInterfaceTypes :: String -> (String -> String -> Boolean) -> Effect (Array TSType)
 readInterfaceTypes tsconfig include = do
   result <- (decodeJson >=> traverse decodeTSType) <$> runEffectFn2 readTypes tsconfig include
